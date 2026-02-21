@@ -1,0 +1,45 @@
+{
+	"name": "practical-online-store",
+	"version": "1.0.0",
+	"description": "A web app where u can browse stuff and buy them by contacting the store owner directly via whatsapp, no fancy backend, just pure practical low effort setup.",
+	"main": "index.js",
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/GollaBharath/Practical-Online-Store.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/GollaBharath/Practical-Online-Store/issues"
+	},
+	"homepage": "https://github.com/GollaBharath/Practical-Online-Store#readme",
+	"dependencies": {
+		"@prisma/client": "^5.22.0",
+		"@supabase/supabase-js": "^2.97.0",
+		"@tailwindcss/postcss": "^4.2.0",
+		"canvas": "^3.2.1",
+		"jspdf": "^4.2.0",
+		"next": "^16.1.6",
+		"prisma": "^5.22.0",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	},
+	"devDependencies": {
+		"@types/node": "^25.3.0",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"autoprefixer": "^10.4.24",
+		"eslint": "^9.39.3",
+		"eslint-config-next": "^16.1.6",
+		"postcss": "^8.5.6",
+		"tailwindcss": "^4.2.0",
+		"typescript": "^5.9.3"
+	}
+}
