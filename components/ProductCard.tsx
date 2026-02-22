@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Product = {
 	id: string;
@@ -15,21 +15,34 @@ export type Product = {
 
 type Flavor = "color" | "bw";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+	product,
+	forcedFlavor,
+}: {
+	product: Product;
+	forcedFlavor?: Flavor | null;
+}) {
 	const [imageError, setImageError] = useState(false);
 
 	const colorAvailable = product.colorPrice > 0;
 	const bwAvailable = product.bwPrice > 0;
 
-	// Default selected flavor: first available one
-	const defaultFlavor: Flavor | null = colorAvailable
-		? "color"
-		: bwAvailable
-			? "bw"
-			: null;
-	const [selectedFlavor, setSelectedFlavor] = useState<Flavor | null>(
-		defaultFlavor,
+	// Default selected flavor: forced (if available on this product) → first available
+	function resolve(flavor: Flavor | null | undefined): Flavor | null {
+		if (flavor === "color" && colorAvailable) return "color";
+		if (flavor === "bw" && bwAvailable) return "bw";
+		return colorAvailable ? "color" : bwAvailable ? "bw" : null;
+	}
+
+	const [selectedFlavor, setSelectedFlavor] = useState<Flavor | null>(() =>
+		resolve(forcedFlavor),
 	);
+
+	// Sync toggle whenever the filter chip changes
+	useEffect(() => {
+		setSelectedFlavor(resolve(forcedFlavor));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [forcedFlavor, colorAvailable, bwAvailable]);
 
 	const displayPrice =
 		selectedFlavor === "color"
