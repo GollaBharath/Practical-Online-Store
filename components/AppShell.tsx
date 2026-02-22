@@ -8,7 +8,7 @@ type AppShellProps = {
 
 export default function AppShell({ children, settings }: AppShellProps) {
 	const { shopName, tagline, phone, address, email, website } = settings;
-	const hasContactInfo = phone || address || email;
+	const hasContactInfo = phone || email;
 
 	return (
 		<div className="flex min-h-screen flex-col bg-[#f8f7f4]">
@@ -77,97 +77,107 @@ export default function AppShell({ children, settings }: AppShellProps) {
 
 			{/* ── Footer ── */}
 			<footer className="border-t border-primary-700 bg-primary-900">
-				<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-					<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6">
+					{/* ── Top row ── */}
+					<div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
 						{/* Brand */}
-						<div>
-							<p className="text-base font-semibold text-white">{shopName}</p>
+						<div className="max-w-xs">
+							<p className="text-base font-bold tracking-tight text-white">
+								{shopName}
+							</p>
 							{tagline ? (
-								<p className="mt-1 text-sm text-primary-400">{tagline}</p>
+								<p className="mt-1.5 text-sm leading-relaxed text-primary-400">
+									{tagline}
+								</p>
 							) : null}
 						</div>
 
-						{/* Contact */}
-						{hasContactInfo ? (
-							<div className="space-y-2">
-								<p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-									Contact
-								</p>
-								{phone ? (
-									<a
-										href={`tel:${phone.replace(/\s+/g, "")}`}
-										className="flex items-center gap-2 text-sm text-slate-200 transition-colors hover:text-white">
-										<svg
-											className="h-4 w-4 shrink-0"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											strokeWidth={1.5}>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-											/>
-										</svg>
-										{phone}
-									</a>
-								) : null}
-								{email ? (
-									<a
-										href={`mailto:${email}`}
-										className="flex items-center gap-2 text-sm text-slate-200 transition-colors hover:text-white">
-										<svg
-											className="h-4 w-4 shrink-0"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											strokeWidth={1.5}>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-											/>
-										</svg>
-										{email}
-									</a>
-								) : null}
-							</div>
-						) : null}
+						{/* Right columns */}
+						<div className="flex flex-col gap-8 sm:flex-row sm:gap-16">
+							{/* Contact — only when phone or email is present */}
+							{hasContactInfo ? (
+								<div className="space-y-3 text-primary-300">
+									<p className="text-xs font-semibold uppercase tracking-widest text-primary-400">
+										Contact
+									</p>
+									{phone ? (
+										<a
+											href={`tel:${phone.replace(/\s+/g, "")}`}
+											className="flex items-center gap-2 text-sm transition-colors hover:text-white">
+											<svg
+												className="h-4 w-4 shrink-0 text-primary-400"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												strokeWidth={1.5}>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+												/>
+											</svg>
+											{phone}
+										</a>
+									) : null}
+									{email ? (
+										<a
+											href={`mailto:${email}`}
+											className="flex items-center gap-2 text-sm transition-colors hover:text-white">
+											<svg
+												className="h-4 w-4 shrink-0 text-primary-400"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												strokeWidth={1.5}>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+												/>
+											</svg>
+											{email}
+										</a>
+									) : null}
+								</div>
+							) : null}
 
-						{/* Address */}
-						{address ? (
-							<div className="space-y-2">
-								<p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-									Location
-								</p>
-								<p className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">
-									{address}
-								</p>
-								{website ? (
-									<a
-										href={website}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex items-center gap-1.5 text-sm text-secondary-400 transition-colors hover:text-secondary-300">
-										<svg
-											className="h-4 w-4 shrink-0"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											strokeWidth={1.5}>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253"
-											/>
-										</svg>
-										{website.replace(/^https?:\/\//, "")}
-									</a>
-								) : null}
-							</div>
-						) : null}
+							{/* Location — only when address is present */}
+							{address ? (
+								<div className="space-y-3">
+									<p className="text-xs font-semibold uppercase tracking-widest text-primary-400">
+										Location
+									</p>
+									<p className="max-w-[220px] text-sm leading-relaxed text-primary-300 whitespace-pre-line">
+										{address}
+									</p>
+									{website ? (
+										<a
+											href={website}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="flex items-center gap-1.5 text-sm text-primary-400 transition-colors hover:text-primary-300">
+											<svg
+												className="h-4 w-4 shrink-0"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												strokeWidth={1.5}>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253"
+												/>
+											</svg>
+											{website.replace(/^https?:\/\//, "")}
+										</a>
+									) : null}
+								</div>
+							) : null}
+						</div>
 					</div>
-					<div className="mt-8 border-t border-primary-800 pt-5 text-center text-xs text-primary-600">
+
+					{/* ── Divider + copyright ── */}
+					<div className="mt-10 border-t border-primary-800 pt-5 text-center text-xs text-primary-600">
 						&copy; {new Date().getFullYear()} {shopName}. All rights reserved.
 					</div>
 				</div>

@@ -103,18 +103,6 @@ export default async function Home({ searchParams }: PageProps) {
 
 	return (
 		<div className="min-h-screen bg-[#f8f7f4]">
-			{/* ── Subtle page header ── */}
-			<div className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
-				<div className="mx-auto max-w-7xl">
-					<h1 className="text-xl font-semibold text-slate-800 sm:text-2xl">
-						Our Products
-					</h1>
-					<p className="mt-1 text-sm text-slate-500">
-						Search or filter to find what you need.
-					</p>
-				</div>
-			</div>
-
 			{/* ── Catalog shell (search + filters + product grid) ── */}
 			<Suspense>
 				<CatalogShell categories={rootCategories} totalResults={total}>
