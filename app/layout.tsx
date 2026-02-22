@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import AppShell from "../components/AppShell";
-import { CartProvider } from "../components/CartContext";
+import { getShopSettings } from "../lib/shop-settings";
 
 export const metadata: Metadata = {
 	title: "Practical Online Store",
-	description: "Browse products and order via WhatsApp",
+	description: "Browse our catalog",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	const settings = await getShopSettings();
+
 	return (
 		<html lang="en">
-			<body className="bg-gray-50">
-				<CartProvider>
-					<AppShell>{children}</AppShell>
-				</CartProvider>
+			<body suppressHydrationWarning>
+				<AppShell settings={settings}>{children}</AppShell>
 			</body>
 		</html>
 	);

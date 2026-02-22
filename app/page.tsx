@@ -1,59 +1,71 @@
-import ProductGrid from "../components/ProductGrid";
-import type { Product } from "../components/ProductCard";
+import { Suspense } from "react";
 import { prisma } from "../lib/prisma";
+import CatalogShell from "../components/CatalogShell";
 
 export default async function Home() {
-	const products = await prisma.product.findMany({
-		orderBy: { createdAt: "desc" },
+	// Fetch root categories + their children for the filter panel
+	const rootCategories = await prisma.category.findMany({
+		where: { parentId: null },
+		orderBy: { name: "asc" },
+		include: {
+			children: {
+				orderBy: { name: "asc" },
+				select: { id: true, name: true },
+			},
+		},
 	});
 
-	const catalog: Product[] = products.map((product) => ({
-		id: product.id,
-		name: product.name,
-		price: Number(product.price),
-		description: product.description,
-		imageUrl: product.imageUrl,
-		category: product.category,
-	}));
-
 	return (
-		<main className="min-h-screen">
-			<section className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 px-4 py-16">
-				<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-				<div className="relative mx-auto max-w-7xl text-center">
-					<div className="inline-block animate-pulse rounded-full bg-white/20 px-4 py-1 text-sm font-semibold text-white backdrop-blur-sm mb-6">
-						✨ Welcome
-					</div>
-					<h1 className="text-5xl font-black tracking-tight text-white drop-shadow-lg sm:text-6xl md:text-7xl">
-						Discover Amazing Products
+		<div className="min-h-screen bg-[#f8f7f4]">
+			{/* ── Subtle page header ── */}
+			<div className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
+				<div className="mx-auto max-w-7xl">
+					<h1 className="text-xl font-semibold text-slate-800 sm:text-2xl">
+						Our Products
 					</h1>
-					<p className="mx-auto mt-6 max-w-2xl text-lg text-primary-100 sm:text-xl">
-						🛍️ Browse our collection, add to cart, and order via WhatsApp in
-						seconds!
-					</p>
-					<div className="mt-8 flex justify-center gap-4">
-						<div className="rounded-2xl bg-white/10 backdrop-blur-md px-6 py-3 shadow-xl">
-							<p className="text-2xl font-bold text-white">{catalog.length}</p>
-							<p className="text-sm text-primary-100">Products</p>
-						</div>
-						<div className="rounded-2xl bg-white/10 backdrop-blur-md px-6 py-3 shadow-xl">
-							<p className="text-2xl font-bold text-white">⚡</p>
-							<p className="text-sm text-primary-100">Fast Order</p>
-						</div>
-					</div>
-				</div>
-			</section>
-			<div className="mx-auto max-w-7xl px-4 py-12">
-				<div className="mb-8 text-center">
-					<h2 className="text-3xl font-black bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent sm:text-4xl">
-						🎯 Featured Products
-					</h2>
-					<p className="mt-2 text-base text-gray-600">
-						Handpicked items just for you
+					<p className="mt-1 text-sm text-slate-500">
+						Search or filter to find what you need.
 					</p>
 				</div>
-				<ProductGrid products={catalog} />
 			</div>
-		</main>
+
+			{/* ── Catalog shell (search + filters + product grid) ── */}
+			<Suspense>
+				<CatalogShell categories={rootCategories}>
+					{/* ─────────────────────────────────────────────────────────────
+					    TODO (backend): replace this placeholder with your actual
+					    product grid. You can read the current filter values from
+					    the URL search-params in this server component and pass
+					    the fetched products to <ProductGrid products={…} />.
+
+					    URL params available:
+					      ?q=<search query>
+					      &category=<categoryId>
+					      &sub=<subcategoryId>
+					      &print=color|bw
+					    ───────────────────────────────────────────────────────────── */}
+					<div className="rounded-xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center">
+						<svg
+							className="mx-auto mb-3 h-10 w-10 text-slate-300"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z"
+							/>
+						</svg>
+						<p className="text-sm font-medium text-slate-500">
+							Use the search bar or filters above to find products.
+						</p>
+						<p className="mt-1 text-xs text-slate-400">
+							Product results will appear here.
+						</p>
+					</div>
+				</CatalogShell>
+			</Suspense>
+		</div>
 	);
 }

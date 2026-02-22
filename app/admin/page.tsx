@@ -17,13 +17,13 @@ export default async function AdminLoginPage({
 	}
 
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500 px-4 py-10">
+		<main className="flex min-h-screen items-center justify-center bg-slate-900 px-4 py-10">
 			<div className="w-full max-w-md">
-				<div className="rounded-3xl border-2 border-white/20 bg-white/95 p-8 shadow-2xl backdrop-blur-xl">
+				<div className="rounded-xl border border-slate-200 bg-white p-8 shadow-xl">
 					<div className="mb-6 text-center">
-						<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg">
+						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary-800 shadow">
 							<svg
-								className="h-8 w-8 text-white"
+								className="h-7 w-7 text-white"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24">
@@ -35,16 +35,14 @@ export default async function AdminLoginPage({
 								/>
 							</svg>
 						</div>
-						<h1 className="text-3xl font-black bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-							🔑 Admin Access
-						</h1>
-						<p className="mt-2 text-sm font-medium text-gray-600">
+						<h1 className="text-2xl font-bold text-slate-900">Admin Access</h1>
+						<p className="mt-1 text-sm text-slate-500">
 							Sign in with your Supabase credentials
 						</p>
 					</div>
 					<AdminLoginForm redirectTo={nextPath} />
-					<p className="mt-6 text-center text-xs font-medium text-gray-500">
-						🔒 Secured by Supabase Authentication
+					<p className="mt-6 text-center text-xs text-slate-400">
+						Secured by Supabase Authentication
 					</p>
 				</div>
 			</div>

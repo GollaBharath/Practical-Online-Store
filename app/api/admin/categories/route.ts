@@ -3,15 +3,6 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase";
 
-const parsePrice = (price: unknown): number | null => {
-	if (typeof price === "number") return price;
-	if (typeof price === "string" && price.trim() !== "") {
-		const parsed = Number(price);
-		return Number.isFinite(parsed) ? parsed : null;
-	}
-	return null;
-};
-
 const requireAdmin = async () => {
 	if (!supabaseAdmin) return null;
 	const cookieStore = await cookies();
@@ -22,7 +13,7 @@ const requireAdmin = async () => {
 	return data.user;
 };
 
-/** POST /api/admin/products — create a product (categoryId required) */
+/** POST /api/admin/categories — create a category */
 export async function POST(request: Request) {
 	try {
 		const user = await requireAdmin();
@@ -35,54 +26,43 @@ export async function POST(request: Request) {
 
 		const body = await request.json();
 		const name = typeof body?.name === "string" ? body.name.trim() : "";
-		const colorPrice = parsePrice(body?.colorPrice) ?? 0;
-		const bwPrice = parsePrice(body?.bwPrice) ?? 0;
-		const categoryId =
-			typeof body?.categoryId === "string" ? body.categoryId.trim() : "";
-
-		if (!name || !categoryId) {
+		if (!name) {
 			return NextResponse.json(
-				{
-					success: false,
-					message: "Name and categoryId are required.",
-				},
+				{ success: false, message: "Name is required." },
 				{ status: 400 },
 			);
 		}
 
-		// Verify category exists
-		const category = await prisma.category.findUnique({
-			where: { id: categoryId },
-		});
-		if (!category) {
-			return NextResponse.json(
-				{ success: false, message: "Category not found." },
-				{ status: 400 },
-			);
+		const parentId =
+			typeof body?.parentId === "string" && body.parentId.trim()
+				? body.parentId.trim()
+				: null;
+
+		// Validate parent exists if provided
+		if (parentId) {
+			const parent = await prisma.category.findUnique({
+				where: { id: parentId },
+			});
+			if (!parent) {
+				return NextResponse.json(
+					{ success: false, message: "Parent category not found." },
+					{ status: 400 },
+				);
+			}
 		}
 
-		const product = await prisma.product.create({
+		const category = await prisma.category.create({
 			data: {
 				name,
-				colorPrice,
-				bwPrice,
 				description:
 					typeof body?.description === "string" ? body.description : null,
 				imageUrl: typeof body?.imageUrl === "string" ? body.imageUrl : null,
-				categoryId,
+				parentId,
 			},
-			include: { category: { select: { id: true, name: true } } },
 		});
 
 		return NextResponse.json(
-			{
-				success: true,
-				data: {
-					...product,
-					colorPrice: Number(product.colorPrice),
-					bwPrice: Number(product.bwPrice),
-				},
-			},
+			{ success: true, data: category },
 			{ status: 201 },
 		);
 	} catch (error) {
@@ -91,7 +71,7 @@ export async function POST(request: Request) {
 	}
 }
 
-/** PUT /api/admin/products — update a product */
+/** PUT /api/admin/categories — update a category */
 export async function PUT(request: Request) {
 	try {
 		const user = await requireAdmin();
@@ -103,33 +83,23 @@ export async function PUT(request: Request) {
 		}
 
 		const body = await request.json();
-		const id = typeof body?.id === "string" ? body.id : "";
+		const id = typeof body?.id === "string" ? body.id.trim() : "";
 		if (!id) {
 			return NextResponse.json(
-				{ success: false, message: "Product id is required." },
+				{ success: false, message: "Category id is required." },
 				{ status: 400 },
 			);
 		}
 
-		const colorPrice = parsePrice(body?.colorPrice);
-		const bwPrice = parsePrice(body?.bwPrice);
 		const data: {
 			name?: string;
-			colorPrice?: number;
-			bwPrice?: number;
 			description?: string | null;
 			imageUrl?: string | null;
-			categoryId?: string;
+			parentId?: string | null;
 		} = {};
 
 		if (typeof body?.name === "string" && body.name.trim()) {
 			data.name = body.name.trim();
-		}
-		if (colorPrice !== null) {
-			data.colorPrice = colorPrice;
-		}
-		if (bwPrice !== null) {
-			data.bwPrice = bwPrice;
 		}
 		if (typeof body?.description === "string") {
 			data.description = body.description;
@@ -137,34 +107,31 @@ export async function PUT(request: Request) {
 		if (typeof body?.imageUrl === "string") {
 			data.imageUrl = body.imageUrl;
 		}
-		if (typeof body?.categoryId === "string" && body.categoryId.trim()) {
-			data.categoryId = body.categoryId.trim();
+		if ("parentId" in body) {
+			data.parentId =
+				typeof body.parentId === "string" && body.parentId.trim()
+					? body.parentId.trim()
+					: null;
 		}
 
-		const product = await prisma.product.update({
-			where: { id },
-			data,
-			include: { category: { select: { id: true, name: true } } },
-		});
+		// Prevent self-parenting
+		if (data.parentId && data.parentId === id) {
+			return NextResponse.json(
+				{ success: false, message: "A category cannot be its own parent." },
+				{ status: 400 },
+			);
+		}
 
-		return NextResponse.json(
-			{
-				success: true,
-				data: {
-					...product,
-					colorPrice: Number(product.colorPrice),
-					bwPrice: Number(product.bwPrice),
-				},
-			},
-			{ status: 200 },
-		);
+		const category = await prisma.category.update({ where: { id }, data });
+
+		return NextResponse.json({ success: true, data: category });
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Unknown error";
 		return NextResponse.json({ success: false, message }, { status: 500 });
 	}
 }
 
-/** DELETE /api/admin/products?id=<id> */
+/** DELETE /api/admin/categories?id=<id> — delete a category */
 export async function DELETE(request: Request) {
 	try {
 		const user = await requireAdmin();
@@ -179,24 +146,49 @@ export async function DELETE(request: Request) {
 		const id = searchParams.get("id");
 		if (!id) {
 			return NextResponse.json(
-				{ success: false, message: "Product id is required." },
+				{ success: false, message: "Category id is required." },
 				{ status: 400 },
 			);
 		}
 
-		const product = await prisma.product.delete({ where: { id } });
+		// Block deletion if it has children or products
+		const category = await prisma.category.findUnique({
+			where: { id },
+			include: { _count: { select: { children: true, products: true } } },
+		});
 
-		return NextResponse.json(
-			{
-				success: true,
-				data: {
-					...product,
-					colorPrice: Number(product.colorPrice),
-					bwPrice: Number(product.bwPrice),
+		if (!category) {
+			return NextResponse.json(
+				{ success: false, message: "Category not found." },
+				{ status: 404 },
+			);
+		}
+
+		if (category._count.children > 0) {
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Cannot delete a category that has sub-categories. Delete them first.",
 				},
-			},
-			{ status: 200 },
-		);
+				{ status: 409 },
+			);
+		}
+
+		if (category._count.products > 0) {
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Cannot delete a category that still has products. Remove or move them first.",
+				},
+				{ status: 409 },
+			);
+		}
+
+		await prisma.category.delete({ where: { id } });
+
+		return NextResponse.json({ success: true });
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Unknown error";
 		return NextResponse.json({ success: false, message }, { status: 500 });

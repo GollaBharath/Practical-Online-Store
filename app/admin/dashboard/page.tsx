@@ -12,7 +12,7 @@ export default async function AdminDashboardPage() {
 	}
 
 	return (
-		<main className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-4 py-8">
+		<main className="min-h-screen bg-slate-100 px-4 py-8">
 			<div className="mx-auto w-full max-w-7xl">
 				<AdminDashboard adminPath={adminPath} adminEmail={user.email} />
 			</div>
